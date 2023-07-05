@@ -52,6 +52,7 @@ export const deleteItem: RequestHandler = async (req, res, next) => {
             `Haven't found a list matching the requested id: ${listId}`
          )
       )
+   
    res.status(StatusCodes.OK).json({ list })
 }
 
@@ -76,8 +77,8 @@ export const patchItemList: RequestHandler = async (req, res, next) => {
       )
    }
 
-   let completed
-   let newProgress
+   let completed = 0
+   let newProgress = 0
    if (adjustedItems.length > 0) {
       completed = calcCompleted()
       newProgress = (completed / adjustedItems.length) * 100
@@ -122,7 +123,7 @@ export const patchCompletedItem: RequestHandler = async (req, res, next) => {
       0
    )
    const newProgress = (completed / items.length) * 100
-
+      console.log(newProgress)
    const list = await List.findOneAndUpdate(
       { _id: listId, createdBy: userId },
       { progress: newProgress, items: items },
