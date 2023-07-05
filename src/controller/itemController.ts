@@ -105,14 +105,13 @@ export interface CollectionItemsInterface {
 }
 
 export const patchCompletedItem: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
-   const {
-      items
-   } = req.body
+   const { items } = req.body
    const { listId } = req.params
    let completed = items.reduce(
       (total: number, curr: CollectionItemsInterface) => {
-         if(curr.completed){
+         if (curr.completed) {
             total++
             return total
          }
@@ -120,8 +119,7 @@ export const patchCompletedItem: RequestHandler = async (req, res, next) => {
       },
       0
    )
-   const newProgress = completed / items.length * 100
-
+   const newProgress = (completed / items.length) * 100
 
    const list = await List.findOneAndUpdate(
       { _id: listId, createdBy: userId },

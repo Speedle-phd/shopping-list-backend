@@ -3,12 +3,16 @@ import { FavoritesModel as Fav } from '../models/favoritesModel'
 import { StatusCodes } from 'http-status-codes'
 import { BadRequestError, NotFoundError } from '../errors'
 
+
+
 export const getAllFavorites: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const favorites = await Fav.find({ createdBy: userId })
    res.status(StatusCodes.OK).json({ favorites })
 }
 export const getFavorite: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { favoritesId: id } = req.params
 
@@ -17,15 +21,17 @@ export const getFavorite: RequestHandler = async (req, res, next) => {
    res.status(StatusCodes.OK).json({ favorites })
 }
 export const createNewFavorites: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { data } = req.body
-   if(!data.name) return next(new BadRequestError('Name must be provided.'))
-   const isExisting = await Fav.findOne({ createdBy: userId, ...data})
-   if(isExisting) return next(new BadRequestError('Item already exists'))
+   if (!data.name) return next(new BadRequestError('Name must be provided.'))
+   const isExisting = await Fav.findOne({ createdBy: userId, ...data })
+   if (isExisting) return next(new BadRequestError('Item already exists'))
    const favorites = await Fav.create({ ...data, createdBy: userId })
    res.status(StatusCodes.OK).json({ favorites })
 }
 export const deleteFavorites: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { favoritesId: id } = req.params
    const favorite = await Fav.findOneAndDelete({ _id: id, createdBy: userId })
@@ -33,6 +39,7 @@ export const deleteFavorites: RequestHandler = async (req, res, next) => {
    res.status(StatusCodes.OK).json({ favorite })
 }
 export const patchFavorite: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { favoritesId: id } = req.params
    const { payload } = req.body
@@ -46,8 +53,9 @@ export const patchFavorite: RequestHandler = async (req, res, next) => {
 }
 
 export const getQueriedFavorites: RequestHandler = async(req, res, next) => {
-   const {userId} = req.user
-   const { q } = req.query as {q: string}
+   // @ts-ignore
+   const { userId } = req.user
+   const { q } = req.query as { q: string }
    const queryObject: { name: {} } = { name: '' }
 
    if (q) {
@@ -56,12 +64,11 @@ export const getQueriedFavorites: RequestHandler = async(req, res, next) => {
 
    const favorites = await Fav.find({ createdBy: userId, ...queryObject })
 
-
    const sortedList = favorites.sort((a, b) => {
       const split_a = a?.name?.toLowerCase().split(q?.toLowerCase())
       const split_b = b?.name?.toLowerCase().split(q?.toLowerCase())
-      if(!split_a || !split_b) return 1
-      if(split_a[0].length > split_b[0].length){
+      if (!split_a || !split_b) return 1
+      if (split_a[0].length > split_b[0].length) {
          return 1
       } else if (split_a[0].length < split_b[0].length) {
          return -1

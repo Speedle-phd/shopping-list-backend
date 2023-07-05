@@ -5,6 +5,7 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from '../errors'
 import bcrypt from 'bcryptjs'
 
 export const changeUsername: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const {
       payload: { username },
@@ -28,21 +29,28 @@ export const changeUsername: RequestHandler = async (req, res, next) => {
 }
 
 export const deleteUser : RequestHandler = async(req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
-   const user = await User.findOneAndDelete({_id: userId})
+   const user = await User.findOneAndDelete({ _id: userId })
    if (!user) return next(new NotFoundError('User not found.'))
-   res.status(StatusCodes.OK).json({user})
+   res.status(StatusCodes.OK).json({ user })
 }
 export const changePassword : RequestHandler = async(req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
-   const {payload: {oldPassword, newPassword}} = req.body
+   const {
+      payload: { oldPassword, newPassword },
+   } = req.body
    if (!oldPassword || !newPassword)
-   return next(new BadRequestError('Please provide an old and a new Password.'))
-   const user = await User.findOne({_id: userId})
-   if(!user) return next(new NotFoundError('User not found.'))
+      return next(
+         new BadRequestError('Please provide an old and a new Password.')
+      )
+   const user = await User.findOne({ _id: userId })
+   if (!user) return next(new NotFoundError('User not found.'))
    // @ts-ignore
    const isMatching = await user.comparePW(oldPassword)
-   if (!isMatching) return next(new UnauthorizedError('You entered the wrong password'))
+   if (!isMatching)
+      return next(new UnauthorizedError('You entered the wrong password'))
    const salt = await bcrypt.genSalt(10)
    const hashedPassword = await bcrypt.hash(newPassword, salt)
    const adjUser = await User.findOneAndUpdate(
@@ -53,6 +61,6 @@ export const changePassword : RequestHandler = async(req, res, next) => {
          runValidators: true,
       }
    )
-   res.status(StatusCodes.OK).json({adjUser})
+   res.status(StatusCodes.OK).json({ adjUser })
 }
 
