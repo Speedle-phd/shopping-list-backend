@@ -5,16 +5,18 @@ import { NotFoundError } from '../errors'
 import { StatusCodes } from 'http-status-codes'
 
 export const getAllItemLists: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
 
    const lists = await List.find({ createdBy: userId })
 
-      // FIXME: Maybe don't even uncomment this line because we don't want to throw an error but return just an empty array
+   // FIXME: Maybe don't even uncomment this line because we don't want to throw an error but return just an empty array
    // if (lists.length < 1)
    //    return next(new NotFoundError("There isn't any data yet."))
    res.status(StatusCodes.OK).json({ listData: lists })
 }
 export const createNewItemList: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { payload } = req.body
    const data = { ...payload, createdBy: userId }
@@ -25,6 +27,7 @@ export const createNewItemList: RequestHandler = async (req, res, next) => {
 }
 
 export const getSingleItemList: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { listId } = req.params
 
@@ -39,6 +42,7 @@ export const getSingleItemList: RequestHandler = async (req, res, next) => {
 }
 
 export const deleteItem: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const { listId } = req.params
    const list = await List.findOneAndDelete({ _id: listId, createdBy: userId })
@@ -52,39 +56,37 @@ export const deleteItem: RequestHandler = async (req, res, next) => {
 }
 
 export const patchItemList: RequestHandler = async (req, res, next) => {
+   // @ts-ignore
    const { userId } = req.user
    const {
       data: { adjustedItems, adjustedTitle },
    } = req.body
    const { listId } = req.params
 
-
-
-   function calcCompleted(){
+   function calcCompleted() {
       return adjustedItems.reduce(
-      (total: number, curr: CollectionItemsInterface) => {
-         if (curr.completed) {
-            total++
+         (total: number, curr: CollectionItemsInterface) => {
+            if (curr.completed) {
+               total++
+               return total
+            }
             return total
-         }
-         return total
-      },
-      0
+         },
+         0
       )
    }
 
-   let completed;
-   let newProgress;
-   if(adjustedItems.length > 0 ){
+   let completed
+   let newProgress
+   if (adjustedItems.length > 0) {
       completed = calcCompleted()
       newProgress = (completed / adjustedItems.length) * 100
    }
 
    const list = await List.findOneAndUpdate(
       { _id: listId, createdBy: userId },
-      { title: adjustedTitle, items: adjustedItems, progress: newProgress},
-      { new: true,
-      runValidators: true}
+      { title: adjustedTitle, items: adjustedItems, progress: newProgress },
+      { new: true, runValidators: true }
    )
    if (!list)
       return next(

@@ -14,9 +14,13 @@ export const auth : RequestHandler = async(req, res, next) => {
       return next(new UnauthorizedError('Authentication invalid'))
    const token = authHeader.split(" ")[1]
    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET!) as PayloadInterface
-      req.user = {userId: payload.userId, username: payload.username}
-      
+      const payload = jwt.verify(
+         token,
+         process.env.JWT_SECRET!
+      ) as PayloadInterface
+      // @ts-ignore
+      req.user = { userId: payload.userId, username: payload.username }
+
       next()
    } catch (error) {
       return next(new UnauthorizedError('Authentication invalid'))
