@@ -11,7 +11,7 @@ const Favorites = new mongoose.Schema(
       },
       department: {
          type: String,
-         enum: ["", 'Bakery', 'Groceries', 'Freezer', 'Household', 'Meat'],
+         enum: ["", 'Bakery', 'Fruit and veg', 'Freezer', 'Household', 'Meat', 'Supplies'],
       },
       createdBy: {
          type: mongoose.Types.ObjectId,
